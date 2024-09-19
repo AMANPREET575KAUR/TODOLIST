@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .container:hover {
+            transform: scale(1.03);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .task-form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            
+        }
+
+        .task-form input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+            
+        }
+
+        .task-form input:focus {
+            border-color: #28a745;
+            
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color:whitesmoke;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #e8f5e9;
+        }
+
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            button {
+                padding: 8px 16px;
+            }
+
+            .task-form input {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Taskify Pro</h1>
+
+        <div class="task-form">
+            <input type="text" id="taskInput" placeholder="Enter new task">
+            <input type="text" id="personInput" placeholder="Assign to (person)">
+            <button id="addTaskBtn">Add Task</button>
+        </div>
+
+        <table id="taskTable">
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Assigned To</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Task rows will be dynamically generated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const taskInput = document.getElementById('taskInput');
+            const personInput = document.getElementById('personInput');
+            const taskTableBody = document.querySelector('#taskTable tbody');
+            const addTaskBtn = document.getElementById('addTaskBtn');
+
+            // Load tasks from localStorage
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+            function renderTasks() {
+                taskTableBody.innerHTML = '';
+                tasks.forEach((task, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${task.name}</td>
+                        <td>${task.person}</td>
+                        <td><button class="remove-btn" data-index="${index}">Remove</button></td>
+                    `;
+                    taskTableBody.appendChild(tr);
+                });
+            }
+
+            // Add new task
+            addTaskBtn.addEventListener('click', () => {
+                const taskName = taskInput.value.trim();
+                const personName = personInput.value.trim();
+
+                if (taskName && personName) {
+                    const newTask = { name: taskName, person: personName };
+                    tasks.push(newTask);
+                    localStorage.setItem('tasks', JSON.stringify(tasks));
+                    taskInput.value = '';
+                    personInput.value = '';
+                    renderTasks();
+                } else {
+                    alert('Please fill in both fields');
+                }
+            });
+
+            // Remove task
+            taskTableBody.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-btn')) {
+                    const index = e.target.getAttribute('data-index');
+                    tasks.splice(index, 1);
+                    localStorage.setItem('tasks', JSON.stringify(tasks));
+                    renderTasks();
+                }
+            });
+
+            // Initial render
+            renderTasks();
+        });
+    </script>
+</body>
+</html>
